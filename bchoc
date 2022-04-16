@@ -11,12 +11,13 @@ from init import init
 from verify import verify
 def syntax_error(reason):
     print("SYNTAX ERROR!! Cause:", reason+ ". Use \"-h\" to see usage information")
+    # print("")
     exit(1)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("action", help="The action you want to perform: [add, checkout, checkin, log, remove, init, verify]")
 parser.add_argument("-c", help="case id")
-parser.add_argument("-i", action='append', nargs="+", help="item id")
+parser.add_argument("-i", nargs="+", help="item id")
 parser.add_argument("-r", "--reverse", action="store_true", help="reverse log order")
 parser.add_argument("-n", help="number of items to log")
 parser.add_argument("-y", "--why", nargs="+", help="why are you removing a block")
@@ -69,7 +70,7 @@ if args.action:
         remove(args.i[0], why, owner)
 
     elif args.action == "init":
-        init(path)
+        init()
 
     elif args.action == "verify":
         verify()
