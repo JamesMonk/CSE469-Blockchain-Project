@@ -1,3 +1,4 @@
+# from asyncio.windows_events import NULL
 import struct
 import os
 from datetime import datetime
@@ -5,33 +6,39 @@ from collections import namedtuple
 from hashlib import *
 import uuid
 import array
+from os.path import exists
 
 def add(path, case_id, item_id):
-    FORMAT_HEAD = struct.Struct("20s d 16s I 11s I")
+    FORMAT_HEADER = struct.Struct("20s d 16s I 11s I")
     FORMAT_DATA = struct.Struct("14s")
-    TUPLE_FOR_HEAD = namedtuple("Head", "hash timestamp case_id item_id state length")
+    TUPLE_FOR_HEADER = namedtuple("header", "sha1 timestamp case_id item_id state length")
     temp = []
     for i in item_id:
         for j in i:
             temp.append(j)
     item_id = temp
+
+    # Remove dashes in case_id
     case_id = case_id.replace("-", "")
+
+    # Reverse the case_id
     case_id = "".join(reversed([case_id[i:i+2] for i in range (0, len(case_id), 2)]))
-    try:
-        f = open(path, "r")
-        f.close()
-    except:
-        head = FORMAT_HEAD.pack(*(str.encode(""), datetime.timestamp(datetime.now()), str.encode(""), 0, str.encode("INITIAL"), 14))
+    
+    # If no block has been created, create one with an initial block
+    if not exists(path):
+        header = FORMAT_HEADER.pack(*(str.encode(""), datetime.timestamp(datetime.now()), str.encode(""), 0, str.encode("INITIAL"), 14))
         data = FORMAT_DATA.pack((str.encode("Initial block")))
         with open(path, 'wb') as f:
-            f.write(head + data)
+            f.write(header + data)
+    
     ids = []
+    # Save all previous item_ids to an array. Array will be used to see if new item_ids are duplicates of old ones 
     with open(path, "rb") as f:
         while True:
             try:
-                head = TUPLE_FOR_HEAD._make(FORMAT_HEAD.unpack(f.read(68)))
-                data = f.read(head.length)
-                ids.append(head.item_id)
+                header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(f.read(68)))
+                data = f.read(header.length)
+                ids.append(header.item_id)
             except:
                 break
     previous_hash = 0
@@ -44,12 +51,12 @@ def add(path, case_id, item_id):
         timestamp = datetime.timestamp(datetime.now())
         state = "CHECKEDIN"
         data_length = 0
-        head = FORMAT_HEAD.pack(*(previous_hash, timestamp, uuid.UUID(case_id).bytes, int(item), str.encode(state), data_length))
+        header = FORMAT_HEADER.pack(*(previous_hash, timestamp, uuid.UUID(case_id).bytes, int(item), str.encode(state), data_length))
         data = FORMAT_DATA.pack(b'')
-        combined = head + data
+        combined = header + data
         previous_hash = sha1(combined).digest()
 
         with open(path, "ab") as f:
-            f.write(head)
+            f.write(header)
             f.write(data)
             
