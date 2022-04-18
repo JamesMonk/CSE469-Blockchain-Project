@@ -3,8 +3,8 @@
 import argparse
 import os
 from add import add
-from checkout import checkout
-from checkin import checkin
+from check import checkout
+from check import checkin
 from log import log
 from remove import remove
 from init import init

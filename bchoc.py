@@ -3,8 +3,8 @@
 import argparse
 import os
 from add import add
-from checkout import checkout
-from checkin import checkin
+from check import checkout
+from check import checkin
 from log import log
 from remove import remove
 from init import init
@@ -39,14 +39,14 @@ if args.action:
             syntax_error("missing item_id")
         if len(args.i) != 1:
             print("[note] only first item id will be checked out")
-        checkout(args.i[0])
+        checkout(args.i[0], path)
         
     elif args.action == "checkin":
         if not args.i:
             syntax_error("missing item_id")
         if len(args.i) != 1:
             print("[note] only first item id will be checked in")
-        checkin(args.i[0])
+        checkin(args.i[0], path)
 
     elif args.action == "log":
         log(args.reverse, args.n, args.c, args.i[0])
