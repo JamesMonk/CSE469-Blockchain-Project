@@ -49,7 +49,10 @@ if args.action:
         checkin(args.i[0], path)
 
     elif args.action == "log":
-        log(args.reverse, args.n, args.c, args.i[0])
+        try:
+            log(args.reverse, args.n, args.c, args.i[0])
+        except:
+            log(args.reverse, args.n, args.c)
 
     elif args.action == "remove":
         if not args.i:
@@ -63,16 +66,19 @@ if args.action:
             why += word + " "
         why = why[:-1]
         owner = ""
-        for word in args.o:
-            owner += word + " "
-        owner = owner[:-1]
-        remove(args.i[0], why, owner)
+        try:
+            for word in args.o:
+                owner += word + " "
+            owner = owner[:-1]
+        except:
+            owner = None
+        remove(args.i[0], why, owner, path)
 
     elif args.action == "init":
         init(path)
 
     elif args.action == "verify":
-        verify()
+        verify(path)
     
     else:
         syntax_error("unrecognized action \"" + args.action + "\"")
