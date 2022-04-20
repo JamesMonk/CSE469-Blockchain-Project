@@ -1,11 +1,9 @@
 # from asyncio.windows_events import NULL
 import struct
-import os
 from datetime import datetime
 from collections import namedtuple
 from hashlib import *
 import uuid
-import array
 from os.path import exists
 
 def add(path, case_id, item_id):
@@ -58,7 +56,7 @@ def add(path, case_id, item_id):
         data = FORMAT_DATA.pack(b'')
         combined = header + data
         previous_hash = sha1(combined).digest()
-
+        
         with open(path, "ab") as f:
             f.write(header)
             f.write(data)

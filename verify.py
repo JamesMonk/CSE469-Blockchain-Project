@@ -1,11 +1,7 @@
 # from sre_parse import State
 import struct
-import os
-from datetime import datetime
 from collections import namedtuple
 from hashlib import *
-import uuid
-import array
 from os.path import exists
 
 def verify(path):
@@ -17,8 +13,6 @@ def verify(path):
     hashes = []
     success = True
     count = 0
-    # last_hash = 0
-    # last_hash = last_hash.to_bytes(16, 'little')
     last_hash = None
     with open(path, "rb") as f:
         while True:
@@ -27,17 +21,15 @@ def verify(path):
                 header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(header_bytes))
                 data = f.read(header.length)
                 state = header.state.decode('utf-8').rstrip('\x00')
-                print("State:", state, "\titem_id:", header.item_id)
                 if state not in ["CHECKEDIN", "CHECKEDOUT", "DESTROYED", "DISPOSED", "RELEASED", "INITIAL"]:
                     success = False
                     exit(1)
                 if state == "INITIAL" and data.decode('utf-8').rstrip('\x00') != "Initial block":
-                    print("initial block header", header)
-                    print("initial block data:", data.decode('utf-8').rstrip('\x00'))
                     success = False
                     exit(1)
-                print("current pointer to previous hash:", header.sha1)
-                print("previous hash:", last_hash)
+                if state == "RELEASED" and header.length == 0:
+                    success = False
+                    exit(1)  
                 if (last_hash != None) and (header.sha1 != last_hash):
                     success = False
                     exit(1)
@@ -70,4 +62,3 @@ def verify(path):
                 if count == 0:
                     exit(1)
                 break
-    # print(ids))

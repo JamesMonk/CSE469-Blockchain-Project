@@ -4,7 +4,6 @@ import struct
 import hashlib
 from datetime import datetime
 from collections import namedtuple
-from actions import *
 def log(path="./output.txt", reverse=False, n=None, case_id=None, item_id=None):
     FORMAT_HEADER = struct.Struct("20s d 16s I 11s I")
     TUPLE_FOR_HEADER = namedtuple("header", "sha1 timestamp case_id item_id state length")
