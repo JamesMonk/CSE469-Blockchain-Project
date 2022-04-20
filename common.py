@@ -37,25 +37,16 @@ def block_structure(path, item_id, str_check, own=False):
     with open(path, 'rb') as f:
         while True:
             try:
-
                 block_size = head_format.size
-                content = f.read(block_size)
-
-                unpack_head = head_format.unpack(content)
-                curr_head = head._make(unpack_head)
-
-                data_size = curr_head.length
-                len_str = str(data_size) + 's'
-                data_format = struct.Struct(len_str)
-                data_content = f.read(data_size)
-
-                unpack_data = data_format.unpack(data_content)
-                curr_data = data._make(unpack_data)
-
-                last_hash = hashlib.sha1(content+data_content).digest()
-                if item_id == curr_head.item_id:
-                    case_id = curr_head.case_id
-                    state = curr_head.state
+                header_bytes = f.read(block_size)
+                unpack_head = head_format.unpack(header_bytes)
+                header = head._make(unpack_head)
+                data_size = header.length
+                data_bytes = f.read(data_size)
+                last_hash = hashlib.sha1(header_bytes+data_bytes).digest()
+                if item_id == header.item_id:
+                    case_id = header.case_id
+                    state = header.state
             except:
                 break
     try:
@@ -89,12 +80,6 @@ def block_structure(path, item_id, str_check, own=False):
                 packed_data = data_format.pack(data_val)
             
             packed_head = head_format.pack(*head_val)
-            
-            unpack_head = head_format.unpack(packed_head)
-           
-            curr_head = head._make(unpack_head)
-            
-            print("owner: ", own)
             
             write_to_file(path, packed_head, packed_data)
         else:

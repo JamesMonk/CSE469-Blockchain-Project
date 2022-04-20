@@ -6,7 +6,6 @@ from os.path import exists
 
 def verify(path):
     FORMAT_HEADER = struct.Struct("20s d 16s I 11s I")
-    FORMAT_DATA = struct.Struct("14s")
     TUPLE_FOR_HEADER = namedtuple("header", "sha1 timestamp case_id item_id state length")
     print("Verifying!!")
     ids = {}
@@ -55,10 +54,11 @@ def verify(path):
                 ids[header.item_id] = state
                 hashes.append(header.sha1)
                 last_hash = sha1(header_bytes + data).digest()
-                print()
             except:
                 if success == False:
                     exit(1)
                 if count == 0:
+                    exit(1)
+                if header_bytes:
                     exit(1)
                 break
