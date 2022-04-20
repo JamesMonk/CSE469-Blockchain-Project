@@ -1,14 +1,5 @@
-# def remove(item_id, reason, owner=None):
-import os
-import struct
-import hashlib
-# from error import *
-from datetime import datetime
-from collections import namedtuple
 
-# from display_trial import display
+from common import block_structure
 
-
-
-def remove(item_id, reason, owner, file_path):
-    pass
+def remove(item_id, reason, file_path, owner):
+    block_structure(file_path, int(item_id[0]), reason, owner)

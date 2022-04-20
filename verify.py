@@ -17,22 +17,28 @@ def verify(path):
     hashes = []
     success = True
     count = 0
+    # last_hash = 0
+    # last_hash = last_hash.to_bytes(16, 'little')
+    last_hash = None
     with open(path, "rb") as f:
         while True:
             try:
-                header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(f.read(68)))
+                header_bytes = f.read(68)
+                header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(header_bytes))
                 data = f.read(header.length)
-                state = state
+                state = header.state.decode('utf-8').rstrip('\x00')
                 print("State:", state, "\titem_id:", header.item_id)
                 if state not in ["CHECKEDIN", "CHECKEDOUT", "DESTROYED", "DISPOSED", "RELEASED", "INITIAL"]:
-                    success = False
-                    exit(1)
-                if header.sha1 in hashes:
                     success = False
                     exit(1)
                 if state == "INITIAL" and data.decode('utf-8').rstrip('\x00') != "Initial block":
                     print("initial block header", header)
                     print("initial block data:", data.decode('utf-8').rstrip('\x00'))
+                    success = False
+                    exit(1)
+                print("current pointer to previous hash:", header.sha1)
+                print("previous hash:", last_hash)
+                if (last_hash != None) and (header.sha1 != last_hash):
                     success = False
                     exit(1)
                 if header.item_id in ids:
@@ -56,10 +62,12 @@ def verify(path):
                 count = 1
                 ids[header.item_id] = state
                 hashes.append(header.sha1)
+                last_hash = sha1(header_bytes + data).digest()
+                print()
             except:
                 if success == False:
                     exit(1)
                 if count == 0:
                     exit(1)
                 break
-    print(ids)
+    # print(ids))
