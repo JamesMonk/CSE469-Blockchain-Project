@@ -50,9 +50,9 @@ if args.action:
 
     elif args.action == "log":
         try:
-            log(args.reverse, args.n, args.c, args.i[0])
+            log(path, args.reverse, args.n, args.c, args.i[0])
         except:
-            log(args.reverse, args.n, args.c)
+            log(path=path, reverse=args.reverse, n=args.n, case_id=args.c)
 
     elif args.action == "remove":
         if not args.i:

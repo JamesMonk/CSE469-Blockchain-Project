@@ -33,16 +33,19 @@ def add(path, case_id, item_id):
     
     ids = []
     # Save all previous item_ids to an array. Array will be used to see if new item_ids are duplicates of old ones 
+    previous_hash = 0
+    previous_hash = previous_hash.to_bytes(128, 'little')
     with open(path, "rb") as f:
         while True:
             try:
-                header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(f.read(68)))
+                header_content = f.read(68)
+                header = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(header_content))
                 data = f.read(header.length)
+                if header.state.decode('utf-8').rstrip('\x00') == "INITIAL":
+                    previous_hash = sha1(header_content+data).digest()
                 ids.append(header.item_id)
             except:
                 break
-    previous_hash = 0
-    previous_hash = previous_hash.to_bytes(128, 'little')
     FORMAT_DATA = struct.Struct("0s")
     for item in item_id:
         if int(item) in ids:

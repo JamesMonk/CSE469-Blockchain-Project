@@ -22,4 +22,5 @@ def init(path):
             head = TUPLE_FOR_HEADER._make(FORMAT_HEADER.unpack_from(f.read(68)))
             data = TUPLE_FOR_DATA._make(FORMAT_DATA.unpack_from(f.read(head.length)))
     except:
+        print("init failed")
         exit(1)
