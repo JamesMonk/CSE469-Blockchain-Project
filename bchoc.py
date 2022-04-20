@@ -2,9 +2,10 @@
 
 import argparse
 import os
+import sys
 from add import add
-from check import checkout
-from check import checkin
+from checkout import checkout
+from checkin import checkin
 from log import log
 from remove import remove
 from init import init
@@ -52,22 +53,11 @@ if args.action:
         log(args.reverse, args.n, args.c, args.i[0])
 
     elif args.action == "remove":
-        if not args.i:
-            syntax_error("missing item_id")
-        if not args.why:
-            syntax_error("missing reason")
-        if len(args.i) != 1:
-            print("[note] only first item id will be removed")
-        why = ""
-        for word in args.why:
-            why += word + " "
-        why = why[:-1]
-        owner = ""
-        for word in args.o:
-            owner += word + " "
-        owner = owner[:-1]
-        remove(args.i[0], why, owner)
-
+        if(args.why[0] == "RELEASED"):
+            if not args.o:
+                sys.exit(4)
+        remove(args.i[0], args.why, path, args.o)
+        
     elif args.action == "init":
         init(path)
 

@@ -55,7 +55,7 @@ def add(path, case_id, item_id):
         data = FORMAT_DATA.pack(b'')
         combined = header + data
         previous_hash = sha1(combined).digest()
-
+        
         with open(path, "ab") as f:
             f.write(header)
             f.write(data)

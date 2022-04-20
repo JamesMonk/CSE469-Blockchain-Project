@@ -1,2 +1,7 @@
-def remove(item_id, reason, owner=None):
-    print("Removing!!\n\titem_id:", item_id, "\n\treason:", reason, "\n\towner:", owner)
+from common import block_structure
+
+def remove(item_id, reason, file_path, owner):
+    block_structure(file_path, int(item_id[0]), reason, owner)
+
+    
+
